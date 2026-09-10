@@ -1,0 +1,90 @@
+# ============ 敏感信息：API Key / 密钥 / 令牌 ============
+# 常见密钥文件与环境变量文件
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.p12
+*.pfx
+*.crt
+*.p8
+*.jks
+secrets.json
+secrets.yaml
+secrets.yml
+credentials.json
+credentials.yaml
+credentials.yml
+config/secrets/
+**/secrets/
+token.txt
+tokens.txt
+access_token*
+refresh_token*
+id_rsa
+id_ed25519
+id_ecdsa
+*.ppk
+known_hosts.aws
+.aws/
+.gcp/
+.azure/
+.gcloud/
+kubeconfig*
+*.tfstate
+*.tfstate.*
+*.tfvars
+
+# 常见服务的本地凭证目录 / 文件
+.npmrc
+.pypirc
+.netrc
+_hgrc.auth
+dockercfg
+.docker/config.json
+
+# ============ 个人隐私 ============
+# 身份证件、账单、简历等个人敏感文档（按扩展名与常见命名）
+*.idcard.*
+*身份证*
+*护照*
+*passport*
+*银行流水*
+*账单*
+*bill*.pdf
+*invoice*.pdf
+*简历*private*
+*.heic.privacy
+*私密*
+*password*
+*密码*
+*账号*
+*address_book*
+*contacts_backup*
+chat_export*
+wechat_export*
+private/
+privacy/
+.personal/
+
+# 备份与同步产生的个人数据
+*backup_of_personal*
+
+# ============ 日志 / 缓存 / 本地运行时数据（可能含敏感信息） ============
+*.log
+logs/
+tmp/
+*.tmp
+.cache/
+.DS_Store
+Thumbs.db
+
+# ============ 编辑器 / 系统 ============
+.idea/
+.vscode/*.local
+*.swp
+*.swo
+
+# 注意：如需新增规则，请先确认不会误伤仓库内容；
+# 已被排除的敏感文件请勿再通过 -f 强制加入版本库。

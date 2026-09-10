@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agent · 概念学习资料</title>
+<style>
+  :root { --ink:#1f2933; --muted:#5f6b76; --accent:#2563eb; --bg:#f8fafc; --card:#ffffff; --line:#e3e8ee; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:"PingFang SC","Microsoft YaHei",-apple-system,sans-serif; background:var(--bg); color:var(--ink); line-height:1.8; }
+  .wrap { max-width:860px; margin:0 auto; padding:48px 24px 80px; }
+  header { border-left:5px solid var(--accent); padding-left:20px; margin-bottom:40px; }
+  header h1 { font-size:2rem; margin-bottom:6px; }
+  header .sub { color:var(--muted); font-size:.95rem; }
+  h2 { font-size:1.3rem; margin:44px 0 16px; padding-bottom:8px; border-bottom:2px solid var(--line); }
+  h2 .no { color:var(--accent); margin-right:8px; }
+  h3 { font-size:1.05rem; margin:20px 0 8px; }
+  p { margin-bottom:12px; }
+  ul, ol { margin:0 0 14px 1.6em; }
+  li { margin-bottom:6px; }
+  .quote { background:var(--card); border-left:4px solid var(--accent); padding:14px 18px; border-radius:0 8px 8px 0; margin-bottom:16px; font-size:1.02rem; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:18px 22px; margin-bottom:14px; }
+  table { width:100%; border-collapse:collapse; margin:12px 0 18px; background:var(--card); }
+  th, td { border:1px solid var(--line); padding:9px 12px; text-align:left; font-size:.93rem; vertical-align:top; }
+  th { background:#eef2f7; }
+  code { background:#eef2f7; padding:2px 6px; border-radius:4px; font-size:.9em; }
+  .tag { display:inline-block; background:#e8effd; color:var(--accent); border-radius:20px; padding:2px 12px; font-size:.82rem; margin-right:6px; }
+  a { color:var(--accent); text-decoration:none; word-break:break-all; }
+  a:hover { text-decoration:underline; }
+  .src li { margin-bottom:10px; }
+  .note { color:var(--muted); font-size:.88rem; }
+  .footer { margin-top:56px; color:var(--muted); font-size:.85rem; text-align:center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>Agent（智能体）</h1>
+  <div class="sub">概念学习资料 · 生成日期 2026-09-10 · 参照《概念学习资料生成》Skill 规范</div>
+  <div style="margin-top:10px;">
+    <span class="tag">人工智能</span><span class="tag">LLM 应用形态</span><span class="tag">自主决策</span>
+  </div>
+</header>
+
+<h2><span class="no">一</span>概念的个人解释</h2>
+<div class="quote">
+  我对 Agent 的理解可以浓缩成一个公式：<strong>Agent = 大模型 + 循环 + 工具 + 目标</strong>。
+</div>
+<p>普通的大模型对话（Chatbot）是一次性的：你问一句，它答一句，答完就结束，"方向盘"始终握在你手里。而 Agent 最本质的变化是——<strong>模型自己接管了控制流</strong>。你只给它一个目标和一批可用的工具，它就开始运转一个循环：观察现状 → 决定下一步做什么 → 调用工具执行 → 看到执行结果 → 再决定下一步……直到它判断目标已经完成。</p>
+<p>打个比方：Chatbot 像一个只能"动嘴"的顾问，你说一步它答一步；Agent 像一个被真正授权的员工——你交代"把这份合同审一遍"，他会自己去翻文件、查资料、列问题清单、给你一份报告，中间每一步做什么不需要你逐条指挥。真正的分水岭不在于模型多聪明，而在于<strong>"下一步做什么"这个决策是谁做的</strong>：你做，是 Copilot；模型做，才是 Agent。</p>
+
+<h2><span class="no">二</span>核心机制或组成</h2>
+<h3>2.1 四个基本构件</h3>
+<div class="card">
+<ul>
+  <li><strong>推理核心（LLM）</strong>：负责理解目标、拆解任务、决定行动顺序，是整个循环的"大脑"。</li>
+  <li><strong>工具（Tools）</strong>：模型不能亲自执行的动作用工具封装，如读写文件、搜索网页、执行代码、调用 API。模型输出的是"调用哪个工具 + 参数"，由运行环境真正执行后把结果喂回给它。</li>
+  <li><strong>循环（The Loop）</strong>：感知 → 决策 → 行动 → 观察结果 → 再决策。Agent 与单次问答的根本区别就是这套循环会持续运行。</li>
+  <li><strong>上下文与记忆</strong>：Agent 在循环中不断积累信息（工具返回、中间结论），需要把这些组织进上下文，长任务还需要外部记忆来对抗上下文窗口的限制。</li>
+</ul>
+</div>
+<h3>2.2 一个重要区分：工作流（Workflow）与自主 Agent</h3>
+<p>按照 Anthropic 在《Building Effective Agents》中的划分，"模型参与系统"有两条路线：<strong>工作流</strong>是开发者预先编排好步骤（提示链、路由、并行、评估-优化等），模型只是各步骤的执行者，流程是确定的；<strong>自主 Agent</strong> 则由模型自己动态决定步骤和顺序。工作流可预测、成本低、适合结构化任务；Agent 灵活、适合开放性任务，但更贵也更难调试。</p>
+<h3>2.3 简化后的运转示意</h3>
+<div class="card">
+<code>目标 + 工具清单</code> → 模型推理 → <code>工具调用请求</code> → 环境执行 → <code>结果返回上下文</code> → 模型再推理 → …… → 判断完成 → 输出最终结果
+</div>
+
+<h2><span class="no">三</span>一个具体应用场景</h2>
+<div class="card">
+<strong>场景：编程智能体（Coding Agent）修复一个线上 Bug。</strong>
+<p>假设开发者对 Agent 说："用户反馈导出 CSV 时中文乱码，请定位并修复。"</p>
+<ol>
+  <li><strong>观察</strong>：Agent 先在代码仓库中搜索"export""csv""encoding"等关键词，读相关源文件，建立对代码结构的理解；</li>
+  <li><strong>决策</strong>：判断问题大概率出在导出模块缺少 BOM 头或未做 UTF-8 转码，决定修改 <code>export.py</code>；</li>
+  <li><strong>行动</strong>：调用文件编辑工具写入修改；</li>
+  <li><strong>验证</strong>：主动调用命令行工具运行单元测试，发现两个测试失败；</li>
+  <li><strong>再决策</strong>：根据报错信息继续修改，再次运行测试，直到全部通过；</li>
+  <li><strong>收尾</strong>：总结修改内容、影响范围，输出变更说明。</li>
+</ol>
+<p>整个过程没有人工逐步指令——"下一步做什么"由模型在循环中自主决定，这正是 Agent 形态与普通代码补全（Copilot 形态）的本质差异。</p>
+</div>
+
+<h2><span class="no">四</span>容易混淆的问题或使用边界</h2>
+<table>
+  <tr><th style="width:28%">易混淆对象</th><th>关键区分</th></tr>
+  <tr><td><strong>Agent vs Chatbot</strong></td><td>Chatbot 是一问一答、无工具、无自主决策；Agent 有目标、有循环、能使用工具并自主规划路径。</td></tr>
+  <tr><td><strong>Agent vs Workflow</strong></td><td>Workflow 的流程由开发者预先写死，模型只是环节执行者；Agent 的流程由模型动态决定。两者常被统称为"Agent"，但工程含义差别很大。</td></tr>
+  <tr><td><strong>Agent vs Copilot</strong></td><td>Copilot 建议、人拍板（人在环上）；Agent 自主执行、人只给目标（人在环外或只在关键节点审批）。</td></tr>
+</table>
+<h3>使用边界：什么时候不该用 Agent</h3>
+<ul>
+  <li><strong>任务结构固定、路径可穷举</strong>时，用工作流更可靠、更便宜、更好排查。Agent 的灵活性只在开放性任务中才有价值。</li>
+  <li><strong>错误代价极高</strong>的场景（如直接操作生产数据库、对外发送邮件）应限制 Agent 权限或强制人工审批，而不是放任自主循环。</li>
+  <li><strong>Agent 会出错且错误会累积</strong>：每一步的失误可能被后续步骤放大，因此需要测试沙箱、日志追踪和可中断机制。</li>
+  <li>常见误区：把"带工具调用的单次问答"也叫 Agent——没有"多步自主决策"的循环，严格说不算 Agent。</li>
+</ul>
+
+<h2><span class="no">五</span>可核查的资料来源</h2>
+<ul class="src">
+  <li><strong>Anthropic 工程博客 · Building Effective Agents</strong>（工作流与 Agent 的权威划分、常见模式）：<br><a href="https://www.anthropic.com/engineering/building-effective-agents">https://www.anthropic.com/engineering/building-effective-agents</a></li>
+  <li><strong>IBM · What are AI Agents?</strong>（Agent 的定义、组成与分类综述）：<br><a href="https://www.ibm.com/think/topics/ai-agents">https://www.ibm.com/think/topics/ai-agents</a></li>
+  <li><strong>Model Context Protocol 官方文档 · What is MCP?</strong>（Agent 连接外部工具的开放协议，佐证"工具"构件）：<br><a href="https://modelcontextprotocol.io/docs/getting-started/intro">https://modelcontextprotocol.io/docs/getting-started/intro</a></li>
+  <li><strong>OpenAI 平台文档 · Text generation and prompting</strong>（模型侧的工具调用基础；该站对自动抓取有 Cloudflare 拦截，浏览器访问正常）：<br><a href="https://platform.openai.com/docs/guides/text">https://platform.openai.com/docs/guides/text</a></li>
+</ul>
+<p class="note">说明：以上链接均为本资料生成当天实际核查过的真实地址，未收录任何未能打开确认的来源。</p>
+
+<div class="footer">概念学习资料 · Agent · 由 concept-learning Skill 规范生成</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-page-node-id="RB5c5uajj0R97CPFoA8VPI">
+<head data-page-node-id="kKXxDoI66t2s5KmLWFYUAM">
+<meta charset="UTF-8" data-page-node-id="ikz7AK0TMsAoH4USVq9S7H">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" data-page-node-id="5fSXeeI8OjJJnBlklPok9g">
+<title>Skill（智能体技能）· 概念学习资料</title>
+<style>
+  :root { --ink:#1f2933; --muted:#5f6b76; --accent:#d97706; --bg:#f8fafc; --card:#ffffff; --line:#e3e8ee; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:"PingFang SC","Microsoft YaHei",-apple-system,sans-serif; background:var(--bg); color:var(--ink); line-height:1.8; }
+  .wrap { max-width:860px; margin:0 auto; padding:48px 24px 80px; }
+  header { border-left:5px solid var(--accent); padding-left:20px; margin-bottom:40px; }
+  header h1 { font-size:2rem; margin-bottom:6px; }
+  header .sub { color:var(--muted); font-size:.95rem; }
+  h2 { font-size:1.3rem; margin:44px 0 16px; padding-bottom:8px; border-bottom:2px solid var(--line); }
+  h2 .no { color:var(--accent); margin-right:8px; }
+  h3 { font-size:1.05rem; margin:20px 0 8px; }
+  p { margin-bottom:12px; }
+  ul, ol { margin:0 0 14px 1.6em; }
+  li { margin-bottom:6px; }
+  .quote { background:var(--card); border-left:4px solid var(--accent); padding:14px 18px; border-radius:0 8px 8px 0; margin-bottom:16px; font-size:1.02rem; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:18px 22px; margin-bottom:14px; }
+  table { width:100%; border-collapse:collapse; margin:12px 0 18px; background:var(--card); }
+  th, td { border:1px solid var(--line); padding:9px 12px; text-align:left; font-size:.93rem; vertical-align:top; }
+  th { background:#fdf3e3; }
+  code { background:#eef2f7; padding:2px 6px; border-radius:4px; font-size:.9em; }
+  .tag { display:inline-block; background:#fbeed8; color:var(--accent); border-radius:20px; padding:2px 12px; font-size:.82rem; margin-right:6px; }
+  a { color:var(--accent); text-decoration:none; word-break:break-all; }
+  a:hover { text-decoration:underline; }
+  .src li { margin-bottom:10px; }
+  .note { color:var(--muted); font-size:.88rem; }
+  .footer { margin-top:56px; color:var(--muted); font-size:.85rem; text-align:center; }
+</style>
+</head>
+<body data-page-node-id="Vr9nj6sVZuWFFgXA2iMIUI">
+<div class="wrap" data-page-node-id="Nahxt7XUSGiNYfFziytLM9">
+
+<header data-page-node-id="beNtKAEVZfMkOpqgvxaD5s">
+  <h1 data-page-node-id="Cxo65J86ro49jdZJuFpCWn">Skill（智能体技能）</h1>
+  <div class="sub" data-page-node-id="MytCVhtonTLRanlsUWZlry">概念学习资料 · 生成日期 2026-09-10 · 参照《概念学习资料生成》Skill 规范</div>
+  <div style="margin-top:10px;" data-page-node-id="U3XhY5YxctC3NOksFhLxuA">
+    <span class="tag" data-page-node-id="mVXDuL2Y45nqY8RpJf7CQD">Agent 能力扩展</span><span class="tag" data-page-node-id="2y4kUn3RgkabniHzF8Ep9S">渐进式披露</span><span class="tag" data-page-node-id="f5D7Ncf9DP3yiEJVtf1XHK">知识打包</span>
+  </div>
+</header>
+
+<h2 data-page-node-id="ELgYDLIVOlNv4wLHcT4rJe"><span class="no" data-page-node-id="LYjxMOLqYqWSHW9NtEGrVq">一</span>概念的个人解释</h2>
+<div class="quote" data-page-node-id="gJTHpzELsjyLR7GQlXwV30">
+  我对 Skill 的理解：<strong data-page-node-id="DxDAWrrqZXfVMiARMznHEw">Skill 是把"某类任务该怎么做"从聊天提示词里搬进文件系统，按需加载的一包专业知识。</strong>
+</div>
+<p data-page-node-id="olPy4riVhFSX7yVGlOh3ZJ">过去我们让模型掌握某个流程（比如"怎么规范地生成 Excel 报表"），靠的是把一大段指令写进系统提示——不管今天用不用得上，这段指令都常年占着上下文。Skill 的思路完全不同：把这类知识写成一个文件夹（核心是一份 <code data-page-node-id="i4fjM6tpBiGWZynGqvulRQ">SKILL.md</code>，带 YAML 元数据声明它"什么时候该被想起"），平时只在上下文里留一行元数据；只有当任务真正匹配时，模型才把正文读进来。</p>
+<p data-page-node-id="Fa5LRfLtVURL3XWBrRgnyM">我觉得最贴切的类比是<strong data-page-node-id="GvJXv2fJe1ZfyCcna4UsFk">新员工的岗位手册</strong>：公司不会第一天就把所有岗位的操作手册背给新人听，而是在新人接手某类任务时说"这种情况去查《报销手册》第 3 章"。Skill 里的 <code data-page-node-id="IMSSHNYfVyAjteAq9Tv3Lx">name/description</code> 就是手册目录上的标题，正文是操作步骤，附属脚本和参考文件是手册的附录。这个设计还有一个妙处——<strong data-page-node-id="E9Ggc0hHDkxJKXBkN9yLUn">知识可以被普通人编写和分享</strong>：写好一个 Skill 不需要写代码、不需要改模型，就像写一篇带目录的文档一样。</p>
+
+<h2 data-page-node-id="c8ZFokoWN0FHJaUEn4Hgcq"><span class="no" data-page-node-id="o5q0r3OcAqFizxf0caAew4">二</span>核心机制或组成</h2>
+<h3 data-page-node-id="N69GblX1SDi7w4aIHwPQs7">2.1 标准结构：一个文件夹</h3>
+<div class="card" data-page-node-id="qlZY0FFEUCsF1YnRtUvuZs">
+<pre style="white-space:pre-wrap;font-family:inherit;margin:0;" data-page-node-id="6eV7PxR0O9WS8TJH3XuduG"><code data-page-node-id="WbfW2P2MzPEAIfjy1olDce">my-skill/
+├── SKILL.md          # 核心：YAML 元数据 + 操作说明正文
+├── references/       # 附属参考文档（按需读取）
+├── scripts/          # 可执行脚本（如格式转换、校验工具）
+└── assets/           # 模板、示例等静态资源</code></pre>
+</div>
+<h3 data-page-node-id="mGyxfGynnNPtRbE1jxQCSY">2.2 渐进式披露（Progressive Disclosure）——Skill 的灵魂</h3>
+<ul data-page-node-id="qyAsIPCUFayyobiXNeQ964">
+  <li data-page-node-id="TiHzevOmjOooo7cuDfbrmg"><strong data-page-node-id="1Jo8Z5BaWdNqzzQw6DUkiD">第一层（始终加载）</strong>：只有 <code data-page-node-id="YuoB67lhdIZzUhlo5lRdNz">name</code> 和 <code data-page-node-id="azHyaLf5zd6tBDY2mc59CG">description</code> 两个元数据字段进入系统提示，几乎不占空间，作用是让模型在成百个技能中"判断该用哪一个"；</li>
+  <li data-page-node-id="C6lgfuCI4WRHujlRr2DAQP"><strong data-page-node-id="FxRPcUptVvq2LaHdeQ1BsI">第二层（匹配时加载）</strong>：任务命中后，模型读取 <code data-page-node-id="c9Wia7u45ylFXZDLpAm7BG">SKILL.md</code> 正文，获得操作流程；</li>
+  <li data-page-node-id="KfqrJJkyEDWt9KrQN4lyTx"><strong data-page-node-id="yIdCv5b7wTHhpd3jybVjpR">第三层（需要时加载）</strong>：正文里引用的参考文档、脚本、资源，只在具体步骤需要时才读或执行。</li>
+</ul>
+<p data-page-node-id="5JdP4unuyiY7JIv8QWXJKq">这个三层结构解决了"知识全面性"与"上下文经济性"的矛盾：知识可以写得非常详尽，但任何时候只支付当前需要的那部分上下文成本。</p>
+<h3 data-page-node-id="RcZGeggMtZ5ryf2TLESPrI">2.3 触发与执行</h3>
+<p data-page-node-id="Iqq5QBCnshTPFmrfgVI4W3">匹配靠 <code data-page-node-id="JJN3RCCkT1kfr2EVxFnDCY">description</code> 写得准——它相当于技能的"触发条件声明"；执行则由模型按 <code data-page-node-id="9U7pFdO0JpUPjzXBBPGOe1">SKILL.md</code> 正文中的指令走，包括调用技能自带的脚本。Skill 已形成开放标准（agentskills.io），由文件夹 + SKILL.md 的约定构成，可跨支持的智能体平台复用。</p>
+
+<h2 data-page-node-id="ptT3qziE4Jt3VnOUjciLT2"><span class="no" data-page-node-id="CprI7vk2oIPHsykHo4aK5t">三</span>一个具体应用场景</h2>
+<div class="card" data-page-node-id="GhDOlqib7G89cJFYnHPLIN">
+<strong data-page-node-id="hXwKwkEA8FwQbWQFjchnB3">场景：智能体处理一份 PDF 表单提取任务。</strong>
+<p data-page-node-id="CaBe76H3phQpFvWquTuAHk">用户上传一份 200 页的 PDF，要求"把每章的表格提取出来整理成 Excel"。智能体的动作序列：</p>
+<ol data-page-node-id="ZYlWTNRK8f3lGqg8ZZqmuU">
+  <li data-page-node-id="TCHnPJihYF8W0z1DDR6sSS"><strong data-page-node-id="WExHgAwqTNwNoAPJPudBUw">触发</strong>：模型在已安装技能列表中看到 <code data-page-node-id="CILXMFXr3vwaDz9EWEwOSb">pdf</code> 技能的描述——"处理 PDF 的读取、拆分、合并、表单与表格提取"，与当前任务匹配，决定加载；</li>
+  <li data-page-node-id="18k1Moqg6sNVBu7dc4xoUw"><strong data-page-node-id="vKwPzkNrwGHI9Jr43zYM1U">读取正文</strong>：读入 <code data-page-node-id="kIp2bVAe1GOsA0HudFLDDj">SKILL.md</code>，了解到处理 PDF 应优先使用某几个 Python 库、拆分与提取的标准做法、常见报错的处理方式；</li>
+  <li data-page-node-id="DxYjuN1bd9s4dMsdlpJzca"><strong data-page-node-id="66gJ4qTneTPKW7wyy54i7D">按需深入</strong>：正文提示"表单字段提取详见 references/forms.md"，模型按指引读取该参考文档；</li>
+  <li data-page-node-id="X3nhnVDP3onUkHJPCNAUmU"><strong data-page-node-id="29iSrfixMDy1YBcMvR8Gnz">执行脚本</strong>：按文档建议运行技能自带的提取脚本，输出表格数据；</li>
+  <li data-page-node-id="h5B1F8DkokCOhfVzRP9hQt"><strong data-page-node-id="kAspIwXOTIsN4Ep4rlMe4u">完成任务</strong>：整理为 Excel 并交付。</li>
+</ol>
+<p data-page-node-id="IYHHmIKGHAA5m8OlvDQyMH">整个过程里，只有这条 PDF 任务链路的知识被加载了——同会话中其他几十个技能（写作、图表、部署……）始终只占一行元数据的空间。这正是"写一次，处处按需用"的价值。</p>
+</div>
+
+<h2 data-page-node-id="PliGcHRIClLsnk0l3CwGHg"><span class="no" data-page-node-id="Egex6YarAkYedzwnr5xOgA">四</span>容易混淆的问题或使用边界</h2>
+<table data-page-node-id="SSdPQTveZIAfinFVacFBg2">
+  <tr data-page-node-id="Q7lZQo6Cblj1BogDH2IfIr"><th style="width:30%" data-page-node-id="t7hRLIqahy0dRBlTnGrGOt">易混淆对象</th><th data-page-node-id="8FWQqr1qClAYPggyRPWKzB">关键区分</th></tr>
+  <tr data-page-node-id="T7lTuCPmKtK6fGg906kCMg"><td data-page-node-id="0FUvhlYn0BeES4tjBjcvYb"><strong data-page-node-id="zfnSdKfDgt7unfDGCHGr21">Skill vs 工具/MCP</strong></td><td data-page-node-id="HFXQyV7Op1SGtY3l2EHEqL">工具/MCP 是"手"——提供模型原本没有的能力接口（查天气、连数据库）；Skill 是"操作手册"——教模型如何组合已有能力做好一类事。二者互补：Skill 常在正文中调用工具或脚本。</td></tr>
+  <tr data-page-node-id="15Q0dN8xopmozRbWwaIiG7"><td data-page-node-id="L5Js8cbsnKtPURClQpbzRf"><strong data-page-node-id="z357K6ei55HBEHSlAdNIKF">Skill vs 系统提示</strong></td><td data-page-node-id="DlCTlFaQ3DM8O0OXO7PiFh">系统提示每次请求全量加载，适合少量全局规则；Skill 按需加载，适合大量、分领域、低频使用的流程知识。把所有知识堆进系统提示是 Skill 要解决的经典反模式。</td></tr>
+  <tr data-page-node-id="YElW0RQANbBxE3MeEWNsSq"><td data-page-node-id="k6gSTJNkJyrNRHmzt7tYPy"><strong data-page-node-id="rWLu4BnFCWW3x6EoJwHBZD">Skill vs Agent</strong></td><td data-page-node-id="SABwwJJVB4yIXETVCVrAbu">Agent 是有自主循环的执行者；Skill 是静态的知识包。Agent 可以"装"很多 Skill，Skill 本身不会自己运行。</td></tr>
+</table>
+<h3 data-page-node-id="L2GqLkOGTvE17JC1GPzPjw">使用边界与注意事项</h3>
+<ul data-page-node-id="4dix2D7OPN7LoK2H7VOX31">
+  <li data-page-node-id="X5mMbvSpEBSuzAWi7790xa"><strong data-page-node-id="sBZRwMVENicBaaM3FlPUbu">description 是唯一触发入口</strong>：写得含糊就永远不会被选中，写得过宽又会被频繁误触发——Skill 的实际效果很大程度取决于这一行字的质量；</li>
+  <li data-page-node-id="zL0fLxUhgP4WKiPgwGVtEj"><strong data-page-node-id="aIeL2MG5MXPsrsCgm1FLtZ">只装不用 ≠ 安全</strong>：第三方 Skill 的脚本在被触发后是以你的权限运行的，安装前必须审查其内容（这正是很多平台要求安装前审计的原因）；</li>
+  <li data-page-node-id="kwH4udP680QEg0B2sF3Vo5"><strong data-page-node-id="AbAM026Rp0tEzCwubW4Auf">Skill 不是万能容器</strong>：需要实时外部数据或新能力的场景该用工具/MCP；纯粹一次性的小任务直接写提示词即可，没必要打包成 Skill；</li>
+  <li data-page-node-id="nWeiLh6sVv92HPD03NXfAb"><strong data-page-node-id="agycae0N7gupGRmIrtJmpw">粒度要合适</strong>：一个 Skill 对应一类任务，不要把不相关的流程塞进同一个 SKILL.md，否则正文冗长、加载浪费。</li>
+</ul>
+
+<h2 data-page-node-id="XNxNy3wy8xAu66k4zw1Skx"><span class="no" data-page-node-id="3cd7DSMfNG61HipheCxDW8">五</span>可核查的资料来源</h2>
+<ul class="src" data-page-node-id="tcBKwdUq9VMoSssR6yQBoQ">
+  <li data-page-node-id="M8wCjjTwsLtSYXlR9f0sO8"><strong data-page-node-id="DBB98WIibxU5ynCiagU7C6">Anthropic 工程博客 · Equipping agents for the real world with Agent Skills</strong>（渐进式披露机制与设计哲学的官方出处）：<br data-page-node-id="QVo5ku4wNwXqorhuKeYFML"><a href="https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills" data-page-node-id="Ms315zubr1Ut6XWqGQnojk">https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills</a></li>
+  <li data-page-node-id="ehJrDwCIUSbUhXB1jHB9os"><strong data-page-node-id="xibtKhcL04xx9uIMqe5mCB">Agent Skills 开放标准官网</strong>（SKILL.md 文件夹约定与规范）：<br data-page-node-id="5qZaDzPOQXqlT5wzrgbUAS"><a href="https://agentskills.io/" data-page-node-id="8QjWe8HvYFN2fKKFbuV1HL">https://agentskills.io/</a></li>
+  <li data-page-node-id="c3DyHz4KixVlLZAWe5iAVR"><strong data-page-node-id="rq0tyLR6mnDlSI5ANTeS2n">Anthropic 官方技能示例仓库</strong>（含 pdf 等真实技能的完整目录结构）：<br data-page-node-id="DBmfVQIcCL6oWI3JJdzcuz"><a href="https://github.com/anthropics/skills" data-page-node-id="CN11g46ORy9lTq68HJV9YH">https://github.com/anthropics/skills</a></li>
+  <li data-page-node-id="RCkxj966gl2GgdnFHgfgU4"><strong data-page-node-id="rzkJqnWYFMfQ4CdfarON8b">Anthropic · Introducing Agent Skills 新闻页</strong>（产品发布信息，被上述工程文引用）：<br data-page-node-id="UVWcfZogqhInd9l36NrMcY"><a href="https://www.anthropic.com/news/skills" data-page-node-id="bXRKHccm8K1Ntk2qo2gJba">https://www.anthropic.com/news/skills</a></li>
+</ul>
+<p class="note" data-page-node-id="Qa1Fv4hBMRjOvDfnEIygjq">说明：以上链接均为本资料生成当天实际核查过的真实地址（官方文档站 docs.anthropic.com 已跳转至 platform.claude.com，故此处收录工程博客与开放标准官网作为稳定入口）。</p>
+
+<div class="footer" data-page-node-id="Cp7JgS4NerbHEQgW4fpBUZ">概念学习资料 · Skill · 由 concept-learning Skill 规范生成</div>
+</div>
+</body>
+</html>

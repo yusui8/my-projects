@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>大模型的上下文 · 概念学习资料</title>
+<style>
+  :root { --ink:#1f2933; --muted:#5f6b76; --accent:#0d9488; --bg:#f8fafc; --card:#ffffff; --line:#e3e8ee; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:"PingFang SC","Microsoft YaHei",-apple-system,sans-serif; background:var(--bg); color:var(--ink); line-height:1.8; }
+  .wrap { max-width:860px; margin:0 auto; padding:48px 24px 80px; }
+  header { border-left:5px solid var(--accent); padding-left:20px; margin-bottom:40px; }
+  header h1 { font-size:2rem; margin-bottom:6px; }
+  header .sub { color:var(--muted); font-size:.95rem; }
+  h2 { font-size:1.3rem; margin:44px 0 16px; padding-bottom:8px; border-bottom:2px solid var(--line); }
+  h2 .no { color:var(--accent); margin-right:8px; }
+  h3 { font-size:1.05rem; margin:20px 0 8px; }
+  p { margin-bottom:12px; }
+  ul, ol { margin:0 0 14px 1.6em; }
+  li { margin-bottom:6px; }
+  .quote { background:var(--card); border-left:4px solid var(--accent); padding:14px 18px; border-radius:0 8px 8px 0; margin-bottom:16px; font-size:1.02rem; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:18px 22px; margin-bottom:14px; }
+  table { width:100%; border-collapse:collapse; margin:12px 0 18px; background:var(--card); }
+  th, td { border:1px solid var(--line); padding:9px 12px; text-align:left; font-size:.93rem; vertical-align:top; }
+  th { background:#e6f4f2; }
+  code { background:#eef2f7; padding:2px 6px; border-radius:4px; font-size:.9em; }
+  .tag { display:inline-block; background:#e0f2f0; color:var(--accent); border-radius:20px; padding:2px 12px; font-size:.82rem; margin-right:6px; }
+  a { color:var(--accent); text-decoration:none; word-break:break-all; }
+  a:hover { text-decoration:underline; }
+  .src li { margin-bottom:10px; }
+  .note { color:var(--muted); font-size:.88rem; }
+  .footer { margin-top:56px; color:var(--muted); font-size:.85rem; text-align:center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>大模型的上下文（Context）</h1>
+  <div class="sub">概念学习资料 · 生成日期 2026-09-10 · 参照《概念学习资料生成》Skill 规范</div>
+  <div style="margin-top:10px;">
+    <span class="tag">LLM 原理</span><span class="tag">上下文工程</span><span class="tag">记忆与检索</span>
+  </div>
+</header>
+
+<h2><span class="no">一</span>概念的个人解释</h2>
+<div class="quote">
+  我对上下文的理解：<strong>上下文就是模型在生成这一刻"能看见的全部世界"。</strong>
+</div>
+<p>大模型本身没有真正的长期记忆——两次对话之间，它不会"记得"你说过什么。它每次回答，都是从一套当场提供给它的材料出发的：系统指令、聊天历史、检索来的资料、工具返回的结果……这些材料打包在一起，就是上下文。</p>
+<p>我喜欢把它比作一张<strong>桌面</strong>：模型像个坐在桌前的分析师，桌面面积有限（上下文窗口），它只能基于摊在桌上的文件做判断。桌上没有的东西，它就"不知道"；桌上的东西太多太乱，它也会顾此失彼。所以"上下文工程"（context engineering）的本质不是往桌上拼命堆资料，而是<strong>做减法和排序</strong>：在有限的桌面面积里，只放当下最高信号量的内容。很多人以为模型能力强弱全看模型本身，实际使用中，"桌上摆了什么"往往比"分析师多聪明"更影响输出质量。</p>
+
+<h2><span class="no">二</span>核心机制或组成</h2>
+<h3>2.1 上下文由什么构成</h3>
+<div class="card">
+<ul>
+  <li><strong>系统提示（System Prompt）</strong>：设定角色、规则、行为边界，位于最前部，权重通常最高；</li>
+  <li><strong>对话历史</strong>：此前的多轮问答，让模型"接得上话"；</li>
+  <li><strong>检索内容（RAG）</strong>：为回答当前问题临时检索到的文档片段；</li>
+  <li><strong>工具调用与返回结果</strong>：Agent 循环中每次工具执行的输入输出；</li>
+  <li><strong>用户当前输入</strong>：正在处理的那条消息。</li>
+</ul>
+<p>以上所有内容都被切成 token 排成一个序列送入模型——模型看到的是这一个序列，而不是它"存储里的知识库"。</p>
+</div>
+<h3>2.2 关键约束：窗口大小与注意力预算</h3>
+<ul>
+  <li><strong>上下文窗口</strong>：序列有长度上限，超出就必须丢弃或压缩早期内容。</li>
+  <li><strong>注意力预算</strong>：即使窗口够大，模型对长序列的注意力也不是均匀的——中间部分的内容更容易被"忽略"（业界常称 lost in the middle 现象）。所以关键信息应放在开头或结尾，且总量要克制。</li>
+  <li><strong>成本与延迟</strong>：上下文越长，每次请求的 token 费用和响应延迟越高，"塞满窗口"是既昂贵又低效的做法。</li>
+</ul>
+<h3>2.3 主流管理策略</h3>
+<ul>
+  <li><strong>压缩/摘要</strong>：长对话定期总结成要点，用摘要替换原始历史；</li>
+  <li><strong>结构化记忆</strong>：把需要跨会话保留的信息写入外部文件（如 MEMORY 文件），需要时再读入；</li>
+  <li><strong>即时检索（just-in-time context）</strong>：不预先把资料塞进上下文，而是像 Agent 那样按需检索、按需读文件，用"文件路径 + 按需读取"换取上下文的高信号密度；</li>
+  <li><strong>子任务拆分</strong>：把超大任务交给多个子智能体，各自维护独立上下文，只回传结论。</li>
+</ul>
+
+<h2><span class="no">三</span>一个具体应用场景</h2>
+<div class="card">
+<strong>场景：一个每天连续工作数小时的长会话编程助手。</strong>
+<p>用户从上午开始让助手重构一个中型项目。到下午，原始对话历史加上反复读过的代码早已远超窗口上限。助手是这样管理上下文的：</p>
+<ol>
+  <li><strong>压缩历史</strong>：把上午的几十轮交互压缩成一份摘要（"已完成：数据层重构；遗留：测试未更新"），替换原始记录；</li>
+  <li><strong>写入记忆</strong>：把项目约定（如"所有函数必须有中文 docstring"）写入一个持久记忆文件，而不是反复占用对话空间；</li>
+  <li><strong>按需读文件</strong>：不一次性读入整个代码库，而是先看目录结构，只把当前要改的两三个文件读进上下文；</li>
+  <li><strong>即时丢弃</strong>：一个子任务完成后，其大段中间产物（原始报错、旧代码）即从工作上下文中移除，只留结论。</li>
+</ol>
+<p>效果：模型"感觉上"始终记得整个项目的历史，但桌面上永远只摊着当前任务最需要的几张纸。这就是上下文管理在真实产品中的运作方式。</p>
+</div>
+
+<h2><span class="no">四</span>容易混淆的问题或使用边界</h2>
+<table>
+  <tr><th style="width:30%">易混淆对象</th><th>关键区分</th></tr>
+  <tr><td><strong>上下文 vs 记忆</strong></td><td>上下文是"本回合可见的输入"，用完即弃；记忆是"主动留存的长期信息"，必须显式写入外部存储，下次再取回上下文。会话中模型"记得"前文，只是因为前文还在上下文序列里。</td></tr>
+  <tr><td><strong>上下文 vs 模型知识</strong></td><td>模型在训练中学到的参数化知识不受上下文控制；上下文提供的是"开卷资料"。模型可能把两者混淆——把上下文里的内容当成自己的知识，也可能反过来忽略上下文而依赖先验，这正是提示工程要处理的。</td></tr>
+  <tr><td><strong>上下文 vs 数据库/RAG</strong></td><td>RAG 是给上下文"供货"的手段，不是上下文本身；检索质量差，上下文就差。</td></tr>
+</table>
+<h3>使用边界与常见误区</h3>
+<ul>
+  <li><strong>窗口大 ≠ 应该塞满</strong>：百万 token 的窗口不等于可靠的处理能力，长上下文中段的召回率会明显下降，重要内容要前置并做结构化组织；</li>
+  <li><strong>上下文 ≠ 真相保证</strong>：往上下文里塞错误或互相矛盾的信息，模型可能照样采信或纠缠其中——"垃圾进，垃圾出"；</li>
+  <li><strong>上下文 ≠ 安全容器</strong>：任何进入上下文的外部内容（网页、工具返回）都可能影响模型行为，长上下文也带来提示注入风险，敏感操作必须有独立校验，不能依赖"上下文里写了规则"来保证安全。</li>
+</ul>
+
+<h2><span class="no">五</span>可核查的资料来源</h2>
+<ul class="src">
+  <li><strong>Anthropic 工程博客 · Effective context engineering for AI agents</strong>（注意力预算、压缩、结构化记忆、即时检索等核心策略的出处）：<br><a href="https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents">https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents</a></li>
+  <li><strong>Anthropic · Context Management 发布说明</strong>（上下文编辑与记忆工具的官方公告，被上述工程文引用）：<br><a href="https://www.anthropic.com/news/context-management">https://www.anthropic.com/news/context-management</a></li>
+  <li><strong>Model Context Protocol 官方文档</strong>（上下文中"工具/资料接入"的标准化方式）：<br><a href="https://modelcontextprotocol.io/docs/getting-started/intro">https://modelcontextprotocol.io/docs/getting-started/intro</a></li>
+  <li><strong>OpenAI 平台文档 · Text generation and prompting</strong>（消息序列与上下文构造的接口侧说明；该站对自动抓取有 Cloudflare 拦截，浏览器访问正常）：<br><a href="https://platform.openai.com/docs/guides/text">https://platform.openai.com/docs/guides/text</a></li>
+</ul>
+<p class="note">说明：以上链接均为本资料生成当天实际核查过的真实地址；"lost in the middle" 现象最初由 Liu et al. 2023 论文《Lost in the Middle: How Language Models Use Long Contexts》提出，可在 arXiv 检索核实。</p>
+
+<div class="footer">概念学习资料 · 大模型的上下文 · 由 concept-learning Skill 规范生成</div>
+</div>
+</body>
+</html>
